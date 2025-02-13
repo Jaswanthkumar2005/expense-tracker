@@ -1,26 +1,15 @@
 import React from "react";
-import { useDispatch } from "react-redux";
 import { IoMdAddCircle } from "react-icons/io";
+import { Link } from "react-router-dom/cjs/react-router-dom.min";
 
-import { openModal, openOverlay } from "../features/uiSlice";
 const NoExpenses = () => {
-  const dispatch = useDispatch();
-
-  const handleOpenModal = () => {
-    dispatch(openModal());
-    dispatch(openOverlay());
-  };
   return (
     <section className="no-expenses">
       <div className="section-center no-expenses-center">
         <h1>woohoo! no expenses in sight!</h1>
-        <button
-          type="button"
-          className="add-expense-btn"
-          onClick={handleOpenModal}
-        >
+        <Link to="/add-expense" className="add-expense-btn">
           add expense <IoMdAddCircle />
-        </button>
+        </Link>
       </div>
     </section>
   );

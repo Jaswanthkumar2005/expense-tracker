@@ -1,5 +1,4 @@
-import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useState } from "react";
 import { CSVLink } from "react-csv";
 import { IoMdDownload } from "react-icons/io";
 import { FaPlus } from "react-icons/fa";
@@ -7,16 +6,26 @@ import { GrClear } from "react-icons/gr";
 import { toast } from "react-toastify";
 import Expense from "./Expense";
 import ExpensesChart from "./ExpensesChart";
-import { clearExpenses } from "../features/profileSlice";
-import { openModal, openOverlay } from "../features/uiSlice";
+import { Link } from "react-router-dom/cjs/react-router-dom.min";
 
-const Expenses = () => {
-  const { expenses } = useSelector((state) => state.profile);
-  const dispatch = useDispatch();
-
-  const handleOpenModal = () => {
-    dispatch(openModal());
-    dispatch(openOverlay());
+const Expenses = ({
+  expenses,
+  setExpenses,
+  expenseToBeEdited,
+  setExpenseToBeEdited,
+}) => {
+  const [filteredExpenses, setFilteredExpenses] = useState(expenses);
+  const handleClearExpenses = () => {
+    setExpenses([]);
+    setFilteredExpenses([]);
+    toast.success("Expenses cleared.");
+  };
+  const handleSearch = (event) => {
+    const searchValue = event.target.value.toLowerCase();
+    const filtered = expenses.filter((expense) =>
+      expense.description.toLowerCase().includes(searchValue)
+    );
+    setFilteredExpenses(filtered);
   };
   return (
     <section className="expenses section-center section">
@@ -25,13 +34,9 @@ const Expenses = () => {
           <span>
             <FaPlus />
           </span>
-          <button
-            type="button"
-            onClick={handleOpenModal}
-            className="expense-control-btn btn"
-          >
+          <Link to="/add-expense" className="expense-control-btn btn">
             add expense
-          </button>
+          </Link>
         </article>
         <article className="expense-control">
           <span>
@@ -49,10 +54,7 @@ const Expenses = () => {
           </span>
           <button
             type="button"
-            onClick={() => {
-              dispatch(clearExpenses());
-              toast.success("Expenses cleared.");
-            }}
+            onClick={handleClearExpenses}
             className="expense-control-btn btn"
           >
             clear expenses
@@ -60,17 +62,41 @@ const Expenses = () => {
         </article>
       </div>
       <div className="expenses-list">
+        <input
+          type="text"
+          name="description"
+          autoComplete="off"
+          placeholder="Search Expenses"
+          className="search-input"
+          onChange={handleSearch}
+        />
+
         <div className="expense-headings">
           <h5>description</h5>
           <h5>amount</h5>
           <h5>category</h5>
           <h5>actions</h5>
         </div>
-        {expenses.map((expense) => {
-          return <Expense expense={expense} key={expense.id} />;
-        })}
+        {filteredExpenses.length === 0 ? (
+          <p className="no-match">NO MATCH FOUND</p>
+        ) : (
+          <>
+            {filteredExpenses.map((expense) => {
+              return (
+                <Expense
+                  setFilteredExpenses={setFilteredExpenses}
+                  expense={expense}
+                  key={expense.id}
+                  expenseToBeEdited={expenseToBeEdited}
+                  setExpenses={setExpenses}
+                  setExpenseToBeEdited={setExpenseToBeEdited}
+                />
+              );
+            })}
+          </>
+        )}
       </div>
-      <ExpensesChart />
+      <ExpensesChart expenses={expenses} />
     </section>
   );
 };

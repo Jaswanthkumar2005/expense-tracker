@@ -1,11 +1,22 @@
 import React from "react";
-import { useSelector } from "react-redux";
 import Expenses from "../components/Expenses";
 import NoExpenses from "../components/NoExpenses";
 
-const HomePage = () => {
-  const { expenses } = useSelector((state) => state.profile);
-  return <main>{expenses.length > 0 ? <Expenses /> : <NoExpenses />}</main>;
+const HomePage = ({ expenses, setExpenses ,expenseToBeEdited,setExpenseToBeEdited}) => {
+  return (
+    <main>
+      {expenses.length > 0 ? (
+        <Expenses
+          expenses={expenses}
+          setExpenses={setExpenses}
+          expenseToBeEdited={expenseToBeEdited}
+          setExpenseToBeEdited={setExpenseToBeEdited}
+        />
+      ) : (
+        <NoExpenses />
+      )}
+    </main>
+  );
 };
 
 export default HomePage;

@@ -1,12 +1,11 @@
 import React from "react";
-import { useSelector } from "react-redux";
 import { Chart as ChartJs, ArcElement, Tooltip, Legend } from "chart.js";
 import { Pie } from "react-chartjs-2";
 
 ChartJs.register(ArcElement, Tooltip, Legend);
 
-const ExpensesChart = () => {
-  const expenses = useSelector((state) => state.profile.expenses);
+const ExpensesChart = ({expenses}) => {
+  
   const food = expenses.filter((item) => item.category === "food");
   const transportation = expenses.filter(
     (item) => item.category === "transportation"

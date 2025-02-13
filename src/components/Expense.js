@@ -1,23 +1,23 @@
 import React from "react";
-import { useDispatch } from "react-redux";
 import { AiFillDelete } from "react-icons/ai";
 import { BiSolidEdit } from "react-icons/bi";
 import { toast } from "react-toastify";
-import { deleteExpense } from "../features/profileSlice";
-import { openModal, openOverlay } from "../features/uiSlice";
 import { formatAmount } from "../utils/helpers";
+import { Link } from "react-router-dom/cjs/react-router-dom.min";
 
-const Expense = ({ expense }) => {
-  const dispatch = useDispatch();
-
+const Expense = ({ expense, setFilteredExpenses, setExpenseToBeEdited,setExpenses }) => {
   const handleDelete = (id) => {
-    dispatch(deleteExpense({ id }));
+    setFilteredExpenses((prevExpenses) =>
+      prevExpenses.filter((expense) => expense.id !== id)
+    );
+    setExpenses((prevExpenses) =>
+      prevExpenses.filter((expense) => expense.id !== id)
+    );
     toast.success("Expense deleted");
   };
 
   const handleEdit = (expense) => {
-    dispatch(openModal(expense));
-    dispatch(openOverlay());
+    setExpenseToBeEdited(expense);
   };
 
   return (
@@ -33,15 +33,16 @@ const Expense = ({ expense }) => {
         >
           <AiFillDelete />
         </button>
-        <button
-          type="button"
+        <Link
+          to="/add-expense"
+         
           className="expense-btn"
           onClick={() => {
             handleEdit(expense);
           }}
         >
           <BiSolidEdit />
-        </button>
+        </Link>
       </div>
     </article>
   );

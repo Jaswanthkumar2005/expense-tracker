@@ -1,20 +1,20 @@
 import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { MdOutlineCurrencyRupee } from "react-icons/md";
 import { RiPencilLine } from "react-icons/ri";
 import { toast } from "react-toastify";
-import { closeModal, closeOverlay } from "../features/uiSlice";
-import { addExpense, editExpense } from "../features/profileSlice";
 import { validateForm } from "../utils/helpers";
+import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 
-const Modal = () => {
-  const { expenses } = useSelector((state) => state.profile);
-  const { expenseToBeEdited: expense } = useSelector((state) => state.ui);
-  const dispatch = useDispatch();
+const AddExpensePage = ({
+  expenseToBeEdited,
+  setExpenseToBeEdited,
+  setExpenses,
+}) => {
+  const history = useHistory();
+  const expense = expenseToBeEdited;
 
   const handleCancel = () => {
-    dispatch(closeModal());
-    dispatch(closeOverlay());
+    setExpenseToBeEdited(null);
   };
 
   const [formData, setFormData] = useState({
@@ -31,47 +31,47 @@ const Modal = () => {
     setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
-  const handleAddExpense = async (e) => {
+  const handleAddExpense =  (e) => {
     e.preventDefault();
     if (
       validateForm(setErrors, formData, {
-        email: false,
-        password: false,
-        confirmPassword: false,
+       
         description: true,
         amount: true,
         category: true,
       })
     ) {
-      if (expense) {
-        dispatch(
-          editExpense({
-            id: expense.id,
-            description: formData.description,
-            amount: formData.amount,
-            category: formData.category,
-          })
+      if(expense) {
+        setExpenses((prevExpenses) =>
+          prevExpenses.map((item) =>
+            item.id === expense.id ? { ...item, ...formData } : item
+          )
         );
         toast.success("Expense updated.");
       } else {
-        dispatch(
-          addExpense({
+        setExpenses((prevExpenses) => [
+          ...prevExpenses,
+          {
             id:
-              expenses.length === 0 ? 1 : expenses[expenses.length - 1].id + 1,
-            description: formData.description,
-            amount: formData.amount,
-            category: formData.category,
-          })
-        );
+              prevExpenses.length === 0
+                ? 1
+                : prevExpenses[prevExpenses.length - 1].id + 1,
+            ...formData,
+          },
+        ]);
+        
+
         toast.success("Expense added.");
       }
       handleCancel();
+      history.push("/");
     } else {
       toast.error("Please fill out all fields correctly");
     }
   };
   return (
-    <form className="modal" noValidate>
+   <div className="add-expense">
+     <form noValidate>
       <h3>{expense ? "Edit Expense" : "Add Expense"}</h3>
       <div className={`input-box ${errors.name && "error-input-box"}`}>
         <input
@@ -136,6 +136,7 @@ const Modal = () => {
         </button>
       </div>
     </form>
+   </div>
   );
 };
-export default Modal;
+export default AddExpensePage;
